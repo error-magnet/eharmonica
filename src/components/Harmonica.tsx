@@ -104,6 +104,19 @@ export function Harmonica({ className }: HarmonicaProps) {
     })
   }, [audioContext, oscillators])
 
+  // Check if holes are adjacent (no gaps allowed)
+  const areHolesAdjacent = useCallback((holeIds: number[]) => {
+    if (holeIds.length <= 1) return true
+
+    const sortedIds = [...holeIds].sort((a, b) => a - b)
+    for (let i = 1; i < sortedIds.length; i++) {
+      if (sortedIds[i] - sortedIds[i - 1] > 1) {
+        return false // Gap found
+      }
+    }
+    return true
+  }, [])
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return
@@ -113,8 +126,12 @@ export function Harmonica({ className }: HarmonicaProps) {
       const hole = harmonicaData.find(h => h.key === key)
 
       if (hole && !activeHoles.has(hole.id)) {
-        setIsDraw(isShiftPressed)
-        playNote(hole, isShiftPressed)
+        // Check if adding this hole would maintain adjacency
+        const newActiveHoles = [...activeHoles, hole.id]
+        if (areHolesAdjacent(newActiveHoles)) {
+          setIsDraw(isShiftPressed)
+          playNote(hole, isShiftPressed)
+        }
       }
     }
 
@@ -134,7 +151,7 @@ export function Harmonica({ className }: HarmonicaProps) {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [activeHoles, playNote, stopNote])
+  }, [activeHoles, playNote, stopNote, areHolesAdjacent])
 
   // Canvas drawing function
   const drawHarmonica = useCallback(() => {
@@ -147,45 +164,60 @@ export function Harmonica({ className }: HarmonicaProps) {
     const { width, height } = canvas
     ctx.clearRect(0, 0, width, height)
 
-    // Draw harmonica body
+    // Draw harmonica body (smaller)
     ctx.fillStyle = '#e5e7eb'
     ctx.strokeStyle = '#9ca3af'
     ctx.lineWidth = 2
-    ctx.fillRect(50, 100, width - 100, 80)
-    ctx.strokeRect(50, 100, width - 100, 80)
+    ctx.fillRect(70, 90, width - 140, 100)
+    ctx.strokeRect(70, 90, width - 140, 100)
 
-    // Draw holes
-    const holeWidth = (width - 120) / 10
+    // Calculate hole positioning - closer together
+    const totalHolesWidth = width - 160
+    const holeSpacing = totalHolesWidth / 10
+    const startX = 80
+
     harmonicaData.forEach((hole, index) => {
-      const x = 60 + index * holeWidth + holeWidth / 2
+      const x = startX + index * holeSpacing + holeSpacing / 2
       const y = 140
 
-      // Draw hole
+      // Draw hole (wider and more square-like)
       ctx.fillStyle = activeHoles.has(hole.id)
         ? isDraw ? '#ef4444' : '#3b82f6'
         : '#374151'
 
+      const holeWidth = 28
+      const holeHeight = 45
       ctx.beginPath()
-      ctx.ellipse(x, y, 8, 25, 0, 0, 2 * Math.PI)
+      ctx.roundRect(x - holeWidth/2, y - holeHeight/2, holeWidth, holeHeight, 3)
       ctx.fill()
 
-      // Draw hole number
+      // Draw hole number above the harmonica
       ctx.fillStyle = '#1f2937'
-      ctx.font = '12px sans-serif'
+      ctx.font = 'bold 11px sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText(hole.id.toString(), x, y - 35)
+      ctx.fillText(hole.id.toString(), x, y - 70)
 
-      // Draw key binding
-      ctx.fillStyle = activeHoles.has(hole.id) ? '#fbbf24' : '#6b7280'
-      ctx.font = '10px sans-serif'
-      ctx.fillText(hole.key.toUpperCase(), x, y + 45)
+      // Draw key binding below the harmonica
+      ctx.fillStyle = activeHoles.has(hole.id) ? '#dc2626' : '#4b5563'
+      ctx.font = 'bold 10px sans-serif'
+      ctx.fillText(hole.key.toUpperCase(), x, y + 70)
+
+      // Draw blow note inside harmonica (top)
+      ctx.fillStyle = '#9ca3af'
+      ctx.font = '9px sans-serif'
+      ctx.fillText(hole.blowNote, x, y - 15)
+
+      // Draw draw note inside harmonica (bottom)
+      ctx.fillStyle = '#a3a3a3'
+      ctx.font = '9px sans-serif'
+      ctx.fillText(hole.drawNote, x, y + 20)
 
       // Visual feedback for active holes
       if (activeHoles.has(hole.id)) {
         ctx.strokeStyle = isDraw ? '#dc2626' : '#2563eb'
         ctx.lineWidth = 3
         ctx.beginPath()
-        ctx.ellipse(x, y, 12, 30, 0, 0, 2 * Math.PI)
+        ctx.roundRect(x - holeWidth/2 - 2, y - holeHeight/2 - 2, holeWidth + 4, holeHeight + 4, 5)
         ctx.stroke()
       }
     })
@@ -216,7 +248,7 @@ export function Harmonica({ className }: HarmonicaProps) {
     <div className="harmonica-container">
       <div className="harmonica-content">
         <div className="header">
-          <h1>Virtual Harmonica</h1>
+          <h1>E-Harmonica</h1>
           <p>Play music with your keyboard</p>
         </div>
 
@@ -255,6 +287,10 @@ export function Harmonica({ className }: HarmonicaProps) {
                 <div className="instruction-dot gray"></div>
                 <span><strong>Hold keys:</strong> Sustain notes</span>
               </div>
+              <div className="instruction-item">
+                <div className="instruction-dot gray"></div>
+                <span><strong>Note:</strong> Only adjacent holes can be played together</span>
+              </div>
             </div>
             <div className="note-reference">
               <h4 className="note-reference-title">Note Reference:</h4>
@@ -284,6 +320,38 @@ export function Harmonica({ className }: HarmonicaProps) {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Song Example */}
+        <div className="card song-example">
+          <h3 className="song-title">🎵 Try "Twinkle Twinkle Little Star"</h3>
+          <div className="song-sequence">
+            <span className="song-note blow">R</span>
+            <span className="song-note blow">R</span>
+            <span className="song-note blow">Y</span>
+            <span className="song-note blow">Y</span>
+            <span className="song-note draw">Y</span>
+            <span className="song-note draw">Y</span>
+            <span className="song-note blow">Y-</span>
+            <span className="song-spacer">|</span>
+            <span className="song-note draw">T</span>
+            <span className="song-note draw">T</span>
+            <span className="song-note blow">T</span>
+            <span className="song-note blow">T</span>
+            <span className="song-note draw">R</span>
+            <span className="song-note draw">R</span>
+            <span className="song-note blow">R-</span>
+          </div>
+          <p className="song-description">Blue notes = blow, Red notes = draw (use Shift)</p>
+        </div>
+
+        {/* GitHub Link */}
+        <div className="github-footer">
+          <a href="https://github.com/error-magnet/eharmonica" target="_blank" rel="noopener noreferrer" className="github-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
