@@ -8,16 +8,20 @@ interface HarmonicaHole {
   blowFreq: number
   drawFreq: number
   key: string
+  sargam?: {
+    blow?: string
+    draw?: string
+  }
 }
 
 const harmonicaData: HarmonicaHole[] = [
   { id: 1, blowNote: 'C4', drawNote: 'D4', blowFreq: 261.63, drawFreq: 293.66, key: 'q' },
   { id: 2, blowNote: 'E4', drawNote: 'G4', blowFreq: 329.63, drawFreq: 392.00, key: 'w' },
   { id: 3, blowNote: 'G4', drawNote: 'B4', blowFreq: 392.00, drawFreq: 493.88, key: 'e' },
-  { id: 4, blowNote: 'C5', drawNote: 'D5', blowFreq: 523.25, drawFreq: 587.33, key: 'r' },
-  { id: 5, blowNote: 'E5', drawNote: 'F5', blowFreq: 659.25, drawFreq: 698.46, key: 't' },
-  { id: 6, blowNote: 'G5', drawNote: 'A5', blowFreq: 783.99, drawFreq: 880.00, key: 'y' },
-  { id: 7, blowNote: 'C6', drawNote: 'B5', blowFreq: 1046.50, drawFreq: 987.77, key: 'u' },
+  { id: 4, blowNote: 'C5', drawNote: 'D5', blowFreq: 523.25, drawFreq: 587.33, key: 'r', sargam: { blow: 'Sa', draw: 'Re' } },
+  { id: 5, blowNote: 'E5', drawNote: 'F5', blowFreq: 659.25, drawFreq: 698.46, key: 't', sargam: { blow: 'Ga', draw: 'Ma' } },
+  { id: 6, blowNote: 'G5', drawNote: 'A5', blowFreq: 783.99, drawFreq: 880.00, key: 'y', sargam: { blow: 'Pa', draw: 'Dha' } },
+  { id: 7, blowNote: 'C6', drawNote: 'B5', blowFreq: 1046.50, drawFreq: 987.77, key: 'u', sargam: { blow: 'Sa', draw: 'Ni' } },
   { id: 8, blowNote: 'E6', drawNote: 'D6', blowFreq: 1318.51, drawFreq: 1174.66, key: 'i' },
   { id: 9, blowNote: 'G6', drawNote: 'F6', blowFreq: 1567.98, drawFreq: 1396.91, key: 'o' },
   { id: 10, blowNote: 'C7', drawNote: 'A6', blowFreq: 2093.00, drawFreq: 1760.00, key: 'p' },
@@ -266,53 +270,75 @@ export function Harmonica() {
           />
         </div>
 
-        {/* Instructions Card */}
+        {/* Harmonica Guide Card */}
         <div className="card instructions-card">
-          <h3 className="instructions-title">How to Play</h3>
-          <div className="instructions-grid">
-            <div className="instructions-list">
-              <div className="instruction-item">
-                <div className="instruction-dot blue"></div>
-                <span><strong>Q-P keys:</strong> Blow notes (exhale)</span>
-              </div>
-              <div className="instruction-item">
-                <div className="instruction-dot red"></div>
-                <span><strong>Shift + keys:</strong> Draw notes (inhale)</span>
-              </div>
-              <div className="instruction-item">
-                <div className="instruction-dot gray"></div>
-                <span><strong>Hold keys:</strong> Sustain notes</span>
-              </div>
-              <div className="instruction-item">
-                <div className="instruction-dot gray"></div>
-                <span><strong>Note:</strong> Only adjacent holes can be played together</span>
-              </div>
-            </div>
-            <div className="note-reference">
-              <h4 className="note-reference-title">Note Reference:</h4>
-              <div className="note-grid">
-                {harmonicaData.slice(0, 5).map(hole => (
-                  <div key={hole.id} className="note-cell">
-                    <div className="note-blow">
-                      {hole.blowNote}
+          <div className="harmonica-guide">
+            <h3 className="guide-title">How to Play</h3>
+
+            <div className="guide-columns">
+              <div className="guide-column-left">
+                <div className="guide-section">
+                  <h5 className="guide-subtitle">How Harmonicas Work</h5>
+                  <p className="guide-text">Each hole has two reeds: one plays when you <strong>blow</strong> (exhale), another when you <strong>draw</strong> (inhale). This gives you 20 different notes from 10 holes!</p>
+                </div>
+
+                <div className="guide-section">
+                  <h5 className="guide-subtitle">Basic Controls</h5>
+                  <div className="basic-controls">
+                    <div className="control-item">
+                      <div className="instruction-dot blue"></div>
+                      <span><strong>Q-P keys:</strong> Blow notes (exhale)</span>
                     </div>
-                    <div className="note-draw">
-                      {hole.drawNote}
+                    <div className="control-item">
+                      <div className="instruction-dot red"></div>
+                      <span><strong>Shift + keys:</strong> Draw notes (inhale)</span>
+                    </div>
+                    <div className="control-item">
+                      <div className="instruction-dot gray"></div>
+                      <span><strong>Hold keys:</strong> Sustain notes</span>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
-              <div className="note-grid">
-                {harmonicaData.slice(5).map(hole => (
-                  <div key={hole.id} className="note-cell">
-                    <div className="note-blow">
-                      {hole.blowNote}
-                    </div>
-                    <div className="note-draw">
-                      {hole.drawNote}
-                    </div>
+
+              <div className="guide-column-right">
+                <div className="guide-section">
+                  <h5 className="guide-subtitle">Playing Technique</h5>
+                  <div className="technique-tips">
+                    <div className="tip">• <strong>Mouth Position:</strong> Cover 1-3 holes with your lips</div>
+                    <div className="tip">• <strong>Breathing:</strong> Use gentle, controlled breath</div>
+                    <div className="tip">• <strong>Adjacent Holes:</strong> Only play holes next to each other</div>
+                    <div className="tip">• <strong>Single Notes:</strong> Purse lips for cleaner sound</div>
                   </div>
-                ))}
+                </div>
+
+                <div className="guide-section">
+                  <h5 className="guide-subtitle">Note Layout (Key of C)</h5>
+                  <div className="note-layout">
+                    <div className="layout-header">
+                      <div className="hole-header">Hole</div>
+                      <div className="key-header">Key</div>
+                      <div className="blow-header">Blow (Exhale)</div>
+                      <div className="draw-header">Draw (Inhale)</div>
+                    </div>
+                    {harmonicaData.map(hole => (
+                      <div key={hole.id} className="layout-row">
+                        <div className="hole-num">{hole.id}</div>
+                        <div className="key-binding">{hole.key.toUpperCase()}</div>
+                        <div className="blow-note">
+                          {hole.blowNote}
+                          {hole.sargam?.blow && <span className="sargam-note">({hole.sargam.blow})</span>}
+                        </div>
+                        <div className="draw-note">
+                          {hole.drawNote}
+                          {hole.sargam?.draw && <span className="sargam-note">({hole.sargam.draw})</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="layout-note">💡 Lower holes (1-3) = bass notes, Higher holes (7-10) = treble notes</p>
+                  <p className="layout-note">🎼 Sargam notation (holes 4-7): Sa Re Ga Ma Pa Dha Ni - Indian classical music scale</p>
+                </div>
               </div>
             </div>
           </div>

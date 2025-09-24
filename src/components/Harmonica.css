@@ -157,47 +157,189 @@
   background-color: #94a3b8;
 }
 
-.note-reference {
+.harmonica-guide {
+  font-size: 13px;
+}
+
+.guide-title {
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 16px 0;
+  font-size: 16px;
+}
+
+.guide-columns {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .guide-columns {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.guide-section {
+  margin-bottom: 20px;
+}
+
+.guide-subtitle {
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.guide-text {
+  color: #475569;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.technique-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tip {
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.basic-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.note-layout {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.layout-header {
+  display: grid;
+  grid-template-columns: 50px 40px 1fr 1fr;
+  background-color: #f8fafc;
+  font-weight: 600;
+  font-size: 11px;
+  color: #475569;
+}
+
+.layout-header > div {
+  padding: 8px 6px;
+  text-align: center;
+  border-right: 1px solid #e2e8f0;
+}
+
+.layout-header > div:last-child {
+  border-right: none;
+}
+
+.layout-row {
+  display: grid;
+  grid-template-columns: 50px 40px 1fr 1fr;
+  border-top: 1px solid #f1f5f9;
   font-size: 12px;
 }
 
-.note-reference-title {
-  font-weight: 500;
-  color: #334155;
-  margin: 0 0 8px 0;
-}
-
-.note-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-}
-
-.note-grid + .note-grid {
-  margin-top: 4px;
-}
-
-.note-cell {
+.layout-row > div {
+  padding: 6px;
   text-align: center;
+  border-right: 1px solid #f1f5f9;
 }
 
-.note-blow {
+.layout-row > div:last-child {
+  border-right: none;
+}
+
+.hole-num {
+  font-weight: 600;
+  color: #374151;
+}
+
+.key-binding {
+  font-weight: 600;
+  color: #6b7280;
+  font-family: monospace;
+}
+
+.blow-note {
   background-color: #dbeafe;
   color: #1d4ed8;
-  padding: 2px 4px;
-  border-radius: 4px;
   font-weight: 500;
-  margin-bottom: 4px;
-  font-size: 12px;
+  border-radius: 3px;
+  margin: 2px;
 }
 
-.note-draw {
+.draw-note {
   background-color: #fecaca;
   color: #dc2626;
-  padding: 2px 4px;
-  border-radius: 4px;
   font-weight: 500;
-  font-size: 12px;
+  border-radius: 3px;
+  margin: 2px;
+}
+
+.layout-note {
+  font-size: 11px;
+  color: #64748b;
+  margin: 0;
+  font-style: italic;
+}
+
+.sargam-note {
+  font-size: 10px;
+  color: #f59e0b;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.sargam-info {
+  font-size: 11px;
+}
+
+.sargam-both {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.sargam-blow {
+  color: #1d4ed8;
+  font-weight: 600;
+  font-size: 10px;
+}
+
+.sargam-draw {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 10px;
+}
+
+.sargam-separator {
+  color: #9ca3af;
+  font-size: 10px;
+}
+
+.sargam-empty {
+  color: #d1d5db;
 }
 
 .song-example {
