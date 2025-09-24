@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { cn } from '../lib/utils'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import './Harmonica.css'
 
 interface HarmonicaHole {
   id: number
@@ -28,6 +28,7 @@ interface HarmonicaProps {
 }
 
 export function Harmonica({ className }: HarmonicaProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [activeHoles, setActiveHoles] = useState<Set<number>>(new Set())
   const [isDraw, setIsDraw] = useState<boolean>(false)
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
@@ -135,73 +136,155 @@ export function Harmonica({ className }: HarmonicaProps) {
     }
   }, [activeHoles, playNote, stopNote])
 
+  // Canvas drawing function
+  const drawHarmonica = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const { width, height } = canvas
+    ctx.clearRect(0, 0, width, height)
+
+    // Draw harmonica body
+    ctx.fillStyle = '#e5e7eb'
+    ctx.strokeStyle = '#9ca3af'
+    ctx.lineWidth = 2
+    ctx.fillRect(50, 100, width - 100, 80)
+    ctx.strokeRect(50, 100, width - 100, 80)
+
+    // Draw holes
+    const holeWidth = (width - 120) / 10
+    harmonicaData.forEach((hole, index) => {
+      const x = 60 + index * holeWidth + holeWidth / 2
+      const y = 140
+
+      // Draw hole
+      ctx.fillStyle = activeHoles.has(hole.id)
+        ? isDraw ? '#ef4444' : '#3b82f6'
+        : '#374151'
+
+      ctx.beginPath()
+      ctx.ellipse(x, y, 8, 25, 0, 0, 2 * Math.PI)
+      ctx.fill()
+
+      // Draw hole number
+      ctx.fillStyle = '#1f2937'
+      ctx.font = '12px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(hole.id.toString(), x, y - 35)
+
+      // Draw key binding
+      ctx.fillStyle = activeHoles.has(hole.id) ? '#fbbf24' : '#6b7280'
+      ctx.font = '10px sans-serif'
+      ctx.fillText(hole.key.toUpperCase(), x, y + 45)
+
+      // Visual feedback for active holes
+      if (activeHoles.has(hole.id)) {
+        ctx.strokeStyle = isDraw ? '#dc2626' : '#2563eb'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.ellipse(x, y, 12, 30, 0, 0, 2 * Math.PI)
+        ctx.stroke()
+      }
+    })
+  }, [activeHoles, isDraw])
+
+  // Update canvas when state changes
+  useEffect(() => {
+    drawHarmonica()
+  }, [drawHarmonica])
+
+  // Handle canvas resize
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const resizeCanvas = () => {
+      canvas.width = Math.min(800, window.innerWidth - 40)
+      canvas.height = 250
+      drawHarmonica()
+    }
+
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+    return () => window.removeEventListener('resize', resizeCanvas)
+  }, [drawHarmonica])
+
   return (
-    <div className={cn("flex flex-col items-center gap-8", className)}>
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-2">Virtual C Harmonica</h1>
-        <p className="text-slate-600">
-          Use keys Q-W-E-R-T-Y-U-I-O-P to play • Hold Shift to draw (inhale)
-        </p>
-        <p className="text-sm text-slate-600 mt-2">
-          {isDraw ? "Drawing (Inhaling)" : "Blowing (Exhaling)"}
-        </p>
-      </div>
+    <div className="harmonica-container">
+      <div className="harmonica-content">
+        <div className="header">
+          <h1>Virtual Harmonica</h1>
+          <p>Play music with your keyboard</p>
+        </div>
 
-      <div className="relative">
-        {/* Harmonica body */}
-        <div className="bg-gradient-to-b from-slate-300 to-slate-500 rounded-lg px-6 py-8 shadow-lg">
-          <div className="flex gap-1">
-            {harmonicaData.map((hole) => (
-              <div
-                key={hole.id}
-                className="flex flex-col items-center"
-              >
-                {/* Hole number and key */}
-                <div className="text-xs text-slate-700 font-semibold mb-1">
-                  {hole.id}
-                </div>
-                <div className="text-xs text-slate-600 mb-2">
-                  {hole.key.toUpperCase()}
-                </div>
-
-                {/* Hole */}
-                <div
-                  className={cn(
-                    "w-6 h-16 bg-black rounded-full shadow-inner transition-all duration-150",
-                    activeHoles.has(hole.id) && "bg-red-500 shadow-red-500/50 shadow-lg"
-                  )}
-                />
-
-                {/* Notes */}
-                <div className="flex flex-col items-center mt-2 text-xs">
-                  <div className={cn(
-                    "text-blue-700 font-medium",
-                    activeHoles.has(hole.id) && !isDraw && "text-blue-900 font-bold"
-                  )}>
-                    {hole.blowNote}
-                  </div>
-                  <div className="text-slate-500 text-[10px]">blow</div>
-                  <div className={cn(
-                    "text-red-700 font-medium mt-1",
-                    activeHoles.has(hole.id) && isDraw && "text-red-900 font-bold"
-                  )}>
-                    {hole.drawNote}
-                  </div>
-                  <div className="text-slate-500 text-[10px]">draw</div>
-                </div>
-              </div>
-            ))}
+        {/* Status Card */}
+        <div className="card status-card">
+          <div className="status-indicator">
+            <div className={`status-dot ${isDraw ? 'draw' : 'blow'}`} />
+            <span className="status-text">
+              {isDraw ? "Drawing (Inhaling)" : "Blowing (Exhaling)"}
+            </span>
           </div>
         </div>
 
-        {/* Brand name */}
-        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-slate-700 font-bold text-sm">
-          HARMONICA
+        {/* Canvas Harmonica */}
+        <div className="card canvas-card">
+          <canvas
+            ref={canvasRef}
+            className="harmonica-canvas"
+          />
         </div>
-      </div>
 
-      <div className="text-center text-sm text-slate-600 max-w-md">
-        <p>Press and hold the keys to play notes. The harmonica will light up red when notes are active.</p>
+        {/* Instructions Card */}
+        <div className="card instructions-card">
+          <h3 className="instructions-title">How to Play</h3>
+          <div className="instructions-grid">
+            <div className="instructions-list">
+              <div className="instruction-item">
+                <div className="instruction-dot blue"></div>
+                <span><strong>Q-P keys:</strong> Blow notes (exhale)</span>
+              </div>
+              <div className="instruction-item">
+                <div className="instruction-dot red"></div>
+                <span><strong>Shift + keys:</strong> Draw notes (inhale)</span>
+              </div>
+              <div className="instruction-item">
+                <div className="instruction-dot gray"></div>
+                <span><strong>Hold keys:</strong> Sustain notes</span>
+              </div>
+            </div>
+            <div className="note-reference">
+              <h4 className="note-reference-title">Note Reference:</h4>
+              <div className="note-grid">
+                {harmonicaData.slice(0, 5).map(hole => (
+                  <div key={hole.id} className="note-cell">
+                    <div className="note-blow">
+                      {hole.blowNote}
+                    </div>
+                    <div className="note-draw">
+                      {hole.drawNote}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="note-grid">
+                {harmonicaData.slice(5).map(hole => (
+                  <div key={hole.id} className="note-cell">
+                    <div className="note-blow">
+                      {hole.blowNote}
+                    </div>
+                    <div className="note-draw">
+                      {hole.drawNote}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
