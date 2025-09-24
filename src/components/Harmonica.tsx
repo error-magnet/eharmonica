@@ -23,11 +23,7 @@ const harmonicaData: HarmonicaHole[] = [
   { id: 10, blowNote: 'C7', drawNote: 'A6', blowFreq: 2093.00, drawFreq: 1760.00, key: 'p' },
 ]
 
-interface HarmonicaProps {
-  className?: string
-}
-
-export function Harmonica({ className }: HarmonicaProps) {
+export function Harmonica() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [activeHoles, setActiveHoles] = useState<Set<number>>(new Set())
   const [isDraw, setIsDraw] = useState<boolean>(false)
