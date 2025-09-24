@@ -91,6 +91,11 @@
 
 .canvas-card {
   padding: 24px;
+  text-align: center;
+}
+
+.canvas-card .status-indicator {
+  margin-top: 16px;
 }
 
 .harmonica-canvas {

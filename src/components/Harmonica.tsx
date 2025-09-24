@@ -252,22 +252,18 @@ export function Harmonica() {
           <p>Play music with your keyboard</p>
         </div>
 
-        {/* Status Card */}
-        <div className="card status-card">
-          <div className="status-indicator">
-            <div className={`status-dot ${isDraw ? 'draw' : 'blow'}`} />
-            <span className="status-text">
-              {isDraw ? "Drawing (Inhaling)" : "Blowing (Exhaling)"}
-            </span>
-          </div>
-        </div>
-
         {/* Canvas Harmonica */}
         <div className="card canvas-card">
           <canvas
             ref={canvasRef}
             className="harmonica-canvas"
           />
+          <div className="status-indicator">
+            <div className={`status-dot ${isDraw ? 'draw' : 'blow'}`} />
+            <span className="status-text">
+              {isDraw ? "Drawing (Inhaling)" : "Blowing (Exhaling)"}
+            </span>
+          </div>
         </div>
 
         {/* Harmonica Guide Card */}
