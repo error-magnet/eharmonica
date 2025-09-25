@@ -33,6 +33,7 @@ export function Harmonica() {
   const [isDraw, setIsDraw] = useState<boolean>(false)
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
   const [oscillators, setOscillators] = useState<Map<number, OscillatorNode>>(new Map())
+  const [isInstructionsCollapsed, setIsInstructionsCollapsed] = useState<boolean>(true)
 
   useEffect(() => {
     // Initialize AudioContext on first user interaction
@@ -269,74 +270,85 @@ export function Harmonica() {
         {/* Harmonica Guide Card */}
         <div className="card instructions-card">
           <div className="harmonica-guide">
-            <h3 className="guide-title">How to Play</h3>
-
-            <div className="guide-columns">
-              <div className="guide-column-left">
-                <div className="guide-section">
-                  <h5 className="guide-subtitle">How Harmonicas Work</h5>
-                  <p className="guide-text">Each hole has two reeds: one plays when you <strong>blow</strong> (exhale), another when you <strong>draw</strong> (inhale). This gives you 20 different notes from 10 holes!</p>
-                </div>
-
-                <div className="guide-section">
-                  <h5 className="guide-subtitle">Basic Controls</h5>
-                  <div className="basic-controls">
-                    <div className="control-item">
-                      <div className="instruction-dot blue"></div>
-                      <span><strong>Q-P keys:</strong> Blow notes (exhale)</span>
-                    </div>
-                    <div className="control-item">
-                      <div className="instruction-dot red"></div>
-                      <span><strong>Shift + keys:</strong> Draw notes (inhale)</span>
-                    </div>
-                    <div className="control-item">
-                      <div className="instruction-dot gray"></div>
-                      <span><strong>Hold keys:</strong> Sustain notes</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="guide-column-right">
-                <div className="guide-section">
-                  <h5 className="guide-subtitle">Playing Technique</h5>
-                  <div className="technique-tips">
-                    <div className="tip">• <strong>Mouth Position:</strong> Cover 1-3 holes with your lips</div>
-                    <div className="tip">• <strong>Breathing:</strong> Use gentle, controlled breath</div>
-                    <div className="tip">• <strong>Adjacent Holes:</strong> Only play holes next to each other</div>
-                    <div className="tip">• <strong>Single Notes:</strong> Purse lips for cleaner sound</div>
-                  </div>
-                </div>
-
-                <div className="guide-section">
-                  <h5 className="guide-subtitle">Note Layout (Key of C)</h5>
-                  <div className="note-layout">
-                    <div className="layout-header">
-                      <div className="hole-header">Hole</div>
-                      <div className="key-header">Key</div>
-                      <div className="blow-header">Blow (Exhale)</div>
-                      <div className="draw-header">Draw (Inhale)</div>
-                    </div>
-                    {harmonicaData.map(hole => (
-                      <div key={hole.id} className="layout-row">
-                        <div className="hole-num">{hole.id}</div>
-                        <div className="key-binding">{hole.key.toUpperCase()}</div>
-                        <div className="blow-note">
-                          {hole.blowNote}
-                          {hole.sargam?.blow && <span className="sargam-note">({hole.sargam.blow})</span>}
-                        </div>
-                        <div className="draw-note">
-                          {hole.drawNote}
-                          {hole.sargam?.draw && <span className="sargam-note">({hole.sargam.draw})</span>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="layout-note">💡 Lower holes (1-3) = bass notes, Higher holes (7-10) = treble notes</p>
-                  <p className="layout-note">🎼 Sargam notation (holes 4-7): Sa Re Ga Ma Pa Dha Ni - Indian classical music scale</p>
-                </div>
-              </div>
+            <div className="guide-header">
+              <h3 className="guide-title">How to Play</h3>
+              <button
+                className="collapse-button"
+                onClick={() => setIsInstructionsCollapsed(!isInstructionsCollapsed)}
+                aria-label={isInstructionsCollapsed ? "Expand instructions" : "Collapse instructions"}
+              >
+                {isInstructionsCollapsed ? '▶' : '▼'}
+              </button>
             </div>
+
+            {!isInstructionsCollapsed && (
+              <div className="guide-columns">
+                <div className="guide-column-left">
+                  <div className="guide-section">
+                    <h5 className="guide-subtitle">How Harmonicas Work</h5>
+                    <p className="guide-text">Each hole has two reeds: one plays when you <strong>blow</strong> (exhale), another when you <strong>draw</strong> (inhale). This gives you 20 different notes from 10 holes!</p>
+                  </div>
+
+                  <div className="guide-section">
+                    <h5 className="guide-subtitle">Basic Controls</h5>
+                    <div className="basic-controls">
+                      <div className="control-item">
+                        <div className="instruction-dot blue"></div>
+                        <span><strong>Q-P keys:</strong> Blow notes (exhale)</span>
+                      </div>
+                      <div className="control-item">
+                        <div className="instruction-dot red"></div>
+                        <span><strong>Shift + keys:</strong> Draw notes (inhale)</span>
+                      </div>
+                      <div className="control-item">
+                        <div className="instruction-dot gray"></div>
+                        <span><strong>Hold keys:</strong> Sustain notes</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="guide-column-right">
+                  <div className="guide-section">
+                    <h5 className="guide-subtitle">Playing Technique</h5>
+                    <div className="technique-tips">
+                      <div className="tip">• <strong>Mouth Position:</strong> Cover 1-3 holes with your lips</div>
+                      <div className="tip">• <strong>Breathing:</strong> Use gentle, controlled breath</div>
+                      <div className="tip">• <strong>Adjacent Holes:</strong> Only play holes next to each other</div>
+                      <div className="tip">• <strong>Single Notes:</strong> Purse lips for cleaner sound</div>
+                    </div>
+                  </div>
+
+                  <div className="guide-section">
+                    <h5 className="guide-subtitle">Note Layout (Key of C)</h5>
+                    <div className="note-layout">
+                      <div className="layout-header">
+                        <div className="hole-header">Hole</div>
+                        <div className="key-header">Key</div>
+                        <div className="blow-header">Blow (Exhale)</div>
+                        <div className="draw-header">Draw (Inhale)</div>
+                      </div>
+                      {harmonicaData.map(hole => (
+                        <div key={hole.id} className="layout-row">
+                          <div className="hole-num">{hole.id}</div>
+                          <div className="key-binding">{hole.key.toUpperCase()}</div>
+                          <div className="blow-note">
+                            {hole.blowNote}
+                            {hole.sargam?.blow && <span className="sargam-note">({hole.sargam.blow})</span>}
+                          </div>
+                          <div className="draw-note">
+                            {hole.drawNote}
+                            {hole.sargam?.draw && <span className="sargam-note">({hole.sargam.draw})</span>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="layout-note">💡 Lower holes (1-3) = bass notes, Higher holes (7-10) = treble notes</p>
+                    <p className="layout-note">🎼 Sargam notation (holes 4-7): Sa Re Ga Ma Pa Dha Ni - Indian classical music scale</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
